@@ -2,9 +2,14 @@ package project.pipi.uiporject.base;
 
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.Test;
 
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * @author Charles
@@ -14,11 +19,9 @@ import java.io.FileReader;
  */
 public class JSonParser {
     public static JSONObject getUserData(int threadID) {
-        JSONParser parser = new JSONParser();
         try {
-            Object obj = parser.parse(new FileReader(System.getProperty("user.dir") + "/src/test/java/com/pipi/" +
-                    "credentials.json"));
-            JSONObject jsonObject = (JSONObject) obj;
+            InputStream inputStream = new FileInputStream(System.getProperty("user.dir") + "/src/test/java/project/pipi/uiporject/data/resource/" + "credentials.json");
+            JSONObject jsonObject = JSON.parseObject(IOUtils.toString(inputStream,"utf8"));
             JSONArray msg = (JSONArray) jsonObject.get("credentials");
             JSONObject a = (JSONObject) msg.get(threadID);
             System.out.println(msg.get(threadID));

@@ -9,10 +9,9 @@ import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.support.PageFactory;
 
 public class MobileLoginPage extends BasePage {
-    public ViewFactory viewFactory = new ViewFactory(driver);
-    public DeviceInterface runnerInfo;
 
     MobileLoginPageObjects mobileLoginPageObjects = new MobileLoginPageObjects();
+
     public MobileLoginPage(AppiumDriver<MobileElement> driver){
         super(driver);
         PageFactory.initElements(new AppiumFieldDecorator(driver), mobileLoginPageObjects);

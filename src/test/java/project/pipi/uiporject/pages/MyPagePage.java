@@ -8,10 +8,10 @@ import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.support.PageFactory;
 
 public class MyPagePage extends BasePage {
-    public ViewFactory viewFactory = new ViewFactory(driver);
-    public DeviceInterface runnerInfo;
+
 
     MyPageObjects myPageObjects = new MyPageObjects();
+
     public MyPagePage(AppiumDriver<MobileElement> driver){
         super(driver);
         PageFactory.initElements(new AppiumFieldDecorator(driver), myPageObjects);

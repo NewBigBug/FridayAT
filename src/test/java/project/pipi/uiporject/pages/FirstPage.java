@@ -1,7 +1,7 @@
 package project.pipi.uiporject.pages;
 
-import com.pipi.base.BasePage;
-import com.pipi.page.objects.FirstPageObjects;
+import project.pipi.uiporject.base.BasePage;
+import project.pipi.uiporject.page.objects.FirstPageObjects;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;

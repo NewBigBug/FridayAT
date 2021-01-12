@@ -8,10 +8,9 @@ import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.support.PageFactory;
 
 public class SystemStingPage extends BasePage {
-    public ViewFactory viewFactory = new ViewFactory(driver);
-    public DeviceInterface runnerInfo;
 
     SystemStingPageObjects systemStingPageObjects = new SystemStingPageObjects();
+
     public SystemStingPage(AppiumDriver<MobileElement> driver){
         super(driver);
         PageFactory.initElements(new AppiumFieldDecorator(driver), systemStingPageObjects);

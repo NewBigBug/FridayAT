@@ -7,10 +7,8 @@ package project.pipi.uiporject.pages;
  * @date 2020/10/22 15:56
  */
 
-import com.pipi.base.BasePage;
-import com.pipi.base.DeviceInterface;
-import com.pipi.base.ViewFactory;
-import com.pipi.page.objects.AgreementAndPermissionPageObjects;
+import project.pipi.uiporject.base.BasePage;
+import project.pipi.uiporject.page.objects.AgreementAndPermissionPageObjects;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
@@ -21,18 +19,15 @@ import java.util.Map;
 
 public class AgreementAndPermissionPage extends BasePage {
 
-    public ViewFactory viewFactory = new ViewFactory(driver);
-    public DeviceInterface runnerInfo;
-
     AgreementAndPermissionPageObjects agreementAndPermissionPageObjects = new AgreementAndPermissionPageObjects();
+
     public AgreementAndPermissionPage(AppiumDriver<MobileElement> driver){
         super(driver);
         PageFactory.initElements(new AppiumFieldDecorator(super.driver), agreementAndPermissionPageObjects);
-        runnerInfo = viewFactory.getMobilePlatform();
     }
 
 
-    public com.pipi.pages.FirstPage acceptAgreementAndPermission() {
+    public FirstPage acceptAgreementAndPermission() {
         String platform = driver.getPlatformName();
         if (platform == null) {
             System.out.println("Something error!");
@@ -85,7 +80,7 @@ public class AgreementAndPermissionPage extends BasePage {
                 agreementAndPermissionPageObjects.IOS_PERMISSION_ALLOW_MESSAGE.click();
             }
         }
-        return new com.pipi.pages.FirstPage(driver);
+        return new FirstPage(driver);
     }
 
 
