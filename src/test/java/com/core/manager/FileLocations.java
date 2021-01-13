@@ -1,25 +1,36 @@
 package com.core.manager;
 
+import static java.lang.System.getenv;
+
 /**
  * @description: some desc
  * @author: charles
- * @date: 2021/1/13 1:35 下午
+ * @date: 2021/1/13 5:59 下午
  */
+public enum FileLocations {
+    OUTPUT_DIRECTORY(""),
+    PARALLEL_XML_LOCATION("parallel.xml"),
+    SCREENSHOTS_DIRECTORY("screenshot/"),
+    ANDROID_SCREENSHOTS_DIRECTORY("screenshot/android/"),
+    IOS_SCREENSHOTS_DIRECTORY("screenshot/iOS/"),
+    APPIUM_LOGS_DIRECTORY("appiumlogs/"),
+    ADB_LOGS_DIRECTORY("adblogs/"),
+    DEVICE_LOGS_DIRECTORY("reports/deviceLogs/"),
+    DERIVED_DATA("derivedData/");
 
+    private final String fileDir;
 
-public interface FileLocations {
-    String OUTPUT_DIRECTORY = System.getenv("OUTPUT_DIRECTORY") != null
-            ? "/" + System.getenv("OUTPUT_DIRECTORY") + "/" : "/target/";
+    FileLocations(String fileDir) {
+        this.fileDir = fileDir;
+    }
 
-    String PARALLEL_XML_LOCATION = OUTPUT_DIRECTORY + "parallel.xml";
+    public String getFileLocation(){
+        String root = System.getenv("OUTPUT_DIRECTORY") != null ? "/" + System.getenv("OUTPUT_DIRECTORY") + "/" : "/target/";
+        return root + fileDir;
+    }
 
-    String SCREENSHOTS_DIRECTORY = OUTPUT_DIRECTORY + "screenshot/";
-    String ANDROID_SCREENSHOTS_DIRECTORY = SCREENSHOTS_DIRECTORY + "android/";
-    String IOS_SCREENSHOTS_DIRECTORY = SCREENSHOTS_DIRECTORY + "iOS/";
-
-    String APPIUM_LOGS_DIRECTORY = OUTPUT_DIRECTORY + "appiumlogs/";
-    String ADB_LOGS_DIRECTORY = OUTPUT_DIRECTORY + "adblogs/";
-    String DEVICE_LOGS_DIRECTORY = OUTPUT_DIRECTORY + "reports/deviceLogs/";
-    String DERIVED_DATA = OUTPUT_DIRECTORY + "derivedData/";
+//    public static void main(String[] args) {
+//        System.out.println(FileLocations.ANDROID_SCREENSHOTS_DIRECTORY.getFileLocation());
+//
+//    }
 }
-
