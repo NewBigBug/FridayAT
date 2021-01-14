@@ -24,13 +24,9 @@ public enum FileLocations {
         this.fileDir = fileDir;
     }
 
-    public String getFileLocation(){
+    public String getFileLocation() {
         String root = System.getenv("OUTPUT_DIRECTORY") != null ? "/" + System.getenv("OUTPUT_DIRECTORY") + "/" : "/target/";
         return root + fileDir;
     }
 
-//    public static void main(String[] args) {
-//        System.out.println(FileLocations.ANDROID_SCREENSHOTS_DIRECTORY.getFileLocation());
-//
-//    }
 }

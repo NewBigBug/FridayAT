@@ -5,6 +5,6 @@ package com.core.manager;
  * @author: charles
  * @date: 2021/1/13 2:40 下午
  */
-public class capabilities {
+public class Capabilities {
     String path = System.getProperty("user.dir") + "/caps/" + "capabilities.json";
 }
