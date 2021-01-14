@@ -1,7 +1,6 @@
 package com.core.executor;
 
 import com.core.manager.ConfigFileManager;
-import com.core.manager.FileLocations;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -43,11 +42,7 @@ public class UIATExecutor {
         Set<Method> setOfMethods = getMethods(pack);
 
     if (exeType.equalsIgnoreCase("distribute")){
-        if(runnerLevel != null && runnerLevel.equalsIgnoreCase("class")){
-            generateTestNGXmlForClassLevelDistributeTest(test,getTestMethods(setOfMethods),suiteName,categoryName,devicesCount);
-        } else {
-            generateTestNGXmlForMethodLevelDistributeTest(test,getTestMethods(setOfMethods),suiteName,categoryName,devicesCount);
-        }
+        generateTestNGXmlForDistributeTest(test,getTestMethods(setOfMethods),suiteName,categoryName,devicesCount,runnerLevel);
     } else {
         generateTestNGXmlForTestLevelParallelTest(test,getTestMethods(setOfMethods),suiteName,categoryName,devicesCount);
     }
@@ -60,10 +55,10 @@ public class UIATExecutor {
 
 
     //构建testng xml文件，Class 级别分发测试
-    public XmlSuite generateTestNGXmlForClassLevelDistributeTest(List<String> tests,
+    public XmlSuite generateTestNGXmlForDistributeTest(List<String> tests,
                                                                  Map<String, List<Method>> methods,
                                                                  String suiteName, String categoryName,
-                                                                 int deviceCount){
+                                                                 int deviceCount, String runnerLevel){
         listeners.add("");//添加testng listener，主要负责appium相关服务和操作内容
         listeners.add("");//添加testng listener，类似于watcher的作用，主要负责失败用例重试
         include(listeners,LISTENERS);//添加自定义监听，例如测试结果上报
@@ -72,7 +67,11 @@ public class UIATExecutor {
         XmlSuite suite = new XmlSuite();
         suite.setName(suiteName);
         suite.setThreadCount(deviceCount);
-        suite.setParallel(XmlSuite.ParallelMode.CLASSES);
+        if (runnerLevel.equalsIgnoreCase("class")){
+            suite.setParallel(XmlSuite.ParallelMode.CLASSES);
+        } else {
+            suite.setParallel(XmlSuite.ParallelMode.METHODS);
+        };
         suite.setVerbose(3);
         suite.setListeners(listeners);
         XmlTest test = new XmlTest(suite);
@@ -80,17 +79,18 @@ public class UIATExecutor {
         test.addParameter("device", "");
         test.setIncludedGroups(groupsExclude);
         test.setExcludedGroups(groupsExclude);
-        List<XmlClass> xmlClasses = wirteXmlClass(tests, methods);
+        List<XmlClass> xmlClasses = writeXmlClass(tests, methods);
         test.setXmlClasses(xmlClasses);
         writeTestNGXmlFile(suite);
         return suite;
     }
 
-    //构建testng xml文件，Method 级别分发测试
-    public XmlSuite generateTestNGXmlForMethodLevelDistributeTest(List<String> tests,
-                                                                 Map<String, List<Method>> methods,
-                                                                 String suiteName, String categoryName,
-                                                                 int deviceCount){
+
+    //构建testng xml文件，Test 级别并发测试
+    public XmlSuite generateTestNGXmlForTestLevelParallelTest(List<String> tests,
+                                                                  Map<String, List<Method>> methods,
+                                                                  String suiteName, String categoryName,
+                                                                  int deviceCount){
         listeners.add("");//添加testng listener，主要负责appium相关服务和操作内容
         listeners.add("");//添加testng listener，类似于watcher的作用，主要负责失败用例重试
         include(listeners,LISTENERS);//添加自定义监听，例如测试结果上报
@@ -99,21 +99,20 @@ public class UIATExecutor {
         XmlSuite suite = new XmlSuite();
         suite.setName(suiteName);
         suite.setThreadCount(deviceCount);
-        suite.setParallel(XmlSuite.ParallelMode.METHODS);
+        suite.setParallel(XmlSuite.ParallelMode.TESTS);
         suite.setVerbose(3);
         suite.setListeners(listeners);
-        CreateGroups createGroups = new CreateGroups(tests, methods, categoryName, suite);
-        return suite;
-
-    }
-
-    //构建testng xml文件，Test 级别并发测试
-    public XmlSuite generateTestNGXmlForTestLevelParallelTest(List<String> tests,
-                                                                  Map<String, List<Method>> methods,
-                                                                  String suiteName, String categoryName,
-                                                                  int deviceCount){
-        XmlSuite suite = new XmlSuite();
-
+        for (int i = 0; i < deviceCount; i++){
+            XmlTest test = new XmlTest(suite);
+            test.setName(categoryName + "_" + i);
+            test.addParameter("device", ""); //需要获取当前连接可用的device udid
+            test.addParameter("hostName",""); //需要获取当前连接可用的hostName
+            test.setIncludedGroups(groupsExclude);
+            test.setExcludedGroups(groupsExclude);
+            List<XmlClass> xmlClasses = writeXmlClass(tests, methods);
+            test.setXmlClasses(xmlClasses);
+        }
+        writeTestNGXmlFile(suite);
         return suite;
 
     }
@@ -174,8 +173,9 @@ public class UIATExecutor {
 
 
     //构造testng class内容
-    private List<XmlClass> wirteXmlClass(List<String> tests, Map<String, List<Method>> methods) {
+    private List<XmlClass> writeXmlClass(List<String> tests, Map<String, List<Method>> methods) {
         List<XmlClass> xmlClasses = new ArrayList<>();
+
         for (String className : methods.keySet()){
             XmlClass xmlClass = new XmlClass();
             xmlClass.setName(className);
@@ -207,42 +207,6 @@ public class UIATExecutor {
         }
     }
 
-    //构造生成group
-    private class CreateGroups {
-        private List<String> tests;
-        private Map<String, List<Method>> methods;
-        private String categoryName;
-        private XmlSuite suite;
-        private List<XmlClass> xmlClasses;
-        private XmlTest test;
-        private List<XmlClass> writeXml;
-
-        public CreateGroups(List<String> tests,
-                            Map<String, List<Method>> methods,
-                            String categoryName, XmlSuite suite) {
-            this.tests = tests;
-            this.methods = methods;
-            this.categoryName = categoryName;
-            this.suite = suite;
-        }
-        public List<XmlClass> getXmlClasses() { return xmlClasses; }
-        public XmlTest getTest() { return test; }
-        public List<XmlClass> getWriteXml() {return writeXml;}
-
-        public CreateGroups invoke() {
-            xmlClasses = wirteXmlClass(tests, methods);
-            test = new XmlTest(suite);
-            test.setName(categoryName);
-            test.addParameter("device", "");
-            include(groupsExclude, EXCLUDE_GROUPS);
-            test.setIncludedGroups(groupsExclude);
-            test.setExcludedGroups(groupsExclude);
-            writeXml = new ArrayList<>();
-            return this;
-        }
-
-
-    }
 
 
 
